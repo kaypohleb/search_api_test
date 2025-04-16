@@ -3,6 +3,7 @@ import SearchHistory from "@/components/SearchHistory";
 import SearchInput from "@/components/SearchInput";
 import SearchResults from "@/components/SearchResults";
 import ThemeSwitcher from "@/components/ThemeSwitcher";
+import { SEARCH_HISTORY_KEY } from "@/utils/localStateKey";
 import React, { useEffect, useState } from "react";
 
 export type LocationInfo = {
@@ -13,7 +14,7 @@ export type LocationInfo = {
   dateSearched: string;
 };
 
-export const SEARCH_HISTORY_KEY = "SearchHistoryState";
+
 export default function Home() {
   const [searchText, setSearchText] = useState<string>("");
   const [preventSearchClose, setPreventSearchClose] = useState<boolean>(false);

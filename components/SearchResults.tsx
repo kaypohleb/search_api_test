@@ -102,6 +102,7 @@ export default function SearchResults({ lat, lon }: SearchResultsProps) {
     return <div>Loading...</div>;
   }
 
+  //only use the first weather since it is considered primary by the API
   return (
     data && (
       <div className="w-full flex flex-row items-end justify-between animate-fadeEnter text-black dark:text-white text-[14px] md:[16px]">
