@@ -25,12 +25,23 @@
   }
 }
 
+@keyframes floatAllAround {
+  0% {
+    transform: rotate(0deg) translateX(5px) rotate(0deg);
+  }
+
+  100% {
+    transform: rotate(-360deg) translateX(5px) rotate(360deg);
+  }
+}
+
 @theme {
   --color-purple: #6c40b5;
   --color-dark-purple: #28124d;
   --color-dark-black: #1a1a1a;
   --animate-fadeEnter: fadeEnter 1s ease-in-out 1;
-  --animate-slightEnterUp: slightEnterUp 2s ease-in-out 1;
+  --animate-slightEnterUp: slightEnterUp 1s ease-in-out 1;
+  --animate-float: floatAllAround 5s linear infinite;
 }
 
 @custom-variant dark (&:where(.dark, .dark *));

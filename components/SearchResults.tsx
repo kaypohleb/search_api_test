@@ -112,12 +112,12 @@ export default function SearchResults({ lat, lon }: SearchResultsProps) {
           width={150}
           height={150}
           sizes="(min-width: 768px) 300px, 300px"
-          className="absolute top-0 right-5 -translate-y-2/5 animate-slightEnterUp w-[160px] md:w-[300px] z-80"
+          className="absolute top-0 right-5 -translate-y-2/5 w-[160px] md:w-[300px] z-80 drop-shadow-2xl animate-float"
         />
         <div className="flex flex-col items-start justify-center gap-1">
           <h2 className="">Today's Weather</h2>
           <h1
-            className="font-bold text-[50px] text-purple dark:text-white md:text-[80px]"
+            className="font-bold text-[50px] text-purple dark:text-white md:text-[80px] animate-slightEnterUp"
             style={{
               lineHeight: "1",
             }}
