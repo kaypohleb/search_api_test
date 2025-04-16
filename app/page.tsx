@@ -17,7 +17,6 @@ export type LocationInfo = {
 
 export default function Home() {
   const [searchText, setSearchText] = useState<string>("");
-  const [preventSearchClose, setPreventSearchClose] = useState<boolean>(false);
   const [currentSearch, setCurrentSearch] = useState<LocationInfo | null>(null);
   const [searchOpen, setSearchOpen] = useState<boolean>(false);
   const [searchHistory, setSearchHistory] = useState<LocationInfo[]>([]);
