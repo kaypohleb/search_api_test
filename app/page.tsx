@@ -1,103 +1,147 @@
-import Image from "next/image";
+"use client";
+import SearchHistory from "@/components/SearchHistory";
+import SearchInput from "@/components/SearchInput";
+import SearchResults from "@/components/SearchResults";
+import ThemeSwitcher from "@/components/ThemeSwitcher";
+import React, { useEffect, useState } from "react";
 
+export type LocationInfo = {
+  name: string;
+  lat: number;
+  lon: number;
+  country: string;
+  dateSearched: string;
+};
+
+export const SEARCH_HISTORY_KEY = "SearchHistoryState";
 export default function Home() {
-  return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="list-inside list-decimal text-sm/6 text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2 tracking-[-.01em]">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-[family-name:var(--font-geist-mono)] font-semibold">
-              app/page.tsx
-            </code>
-            .
-          </li>
-          <li className="tracking-[-.01em]">
-            Save and see your changes instantly.
-          </li>
-        </ol>
+  const [searchText, setSearchText] = useState<string>("");
+  const [preventSearchClose, setPreventSearchClose] = useState<boolean>(false);
+  const [currentSearch, setCurrentSearch] = useState<LocationInfo | null>(null);
+  const [searchOpen, setSearchOpen] = useState<boolean>(false);
+  const [searchHistory, setSearchHistory] = useState<LocationInfo[]>([]);
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:w-auto"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 w-full sm:w-auto md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
+  useEffect(() => {
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(success, error);
+    } else {
+      console.log("Geolocation not supported");
+    }
+  }, []);
+
+  const success = (position: GeolocationPosition) => {
+    const latitude = position.coords.latitude;
+    const longitude = position.coords.longitude;
+    setCurrentSearch({
+      name: "Current Location",
+      lat: latitude,
+      lon: longitude,
+      country: "N/A",
+      dateSearched: new Date().toUTCString(),
+    });
+  };
+
+  function error() {
+    console.log("Unable to retrieve your location");
+  }
+
+  useEffect(() => {
+    const storedHistory = localStorage.getItem(SEARCH_HISTORY_KEY);
+    if (storedHistory && storedHistory !== JSON.stringify(searchHistory)) {
+      setSearchHistory(JSON.parse(storedHistory) || []);
+    }
+  }, []);
+
+  // Sync from other tabs
+  useEffect(() => {
+    const handleStorageChange = (e: StorageEvent) => {
+      if (e.key === SEARCH_HISTORY_KEY && e.newValue) {
+        const newHistory = JSON.parse(e.newValue);
+        setSearchHistory(newHistory);
+      }
+    };
+    window.addEventListener("storage", handleStorageChange);
+    return () => window.removeEventListener("storage", handleStorageChange);
+  }, []);
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Enter") {
+      setSearchOpen(true);
+    }
+  };
+
+  const handleSearchButton = () => {
+    setSearchOpen(true);
+  };
+
+  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchText(e.target.value);
+  };
+
+  const handleSearchSelect = (search: LocationInfo) => {
+    setSearchText("");
+    setCurrentSearch(search);
+    const localHistory = localStorage.getItem(SEARCH_HISTORY_KEY);
+    const curSearchHistory: Array<LocationInfo> = localHistory
+      ? JSON.parse(localHistory)
+      : [];
+
+    //filter out any previous searches with the same name and country
+    //add the new search to the end of the array
+    const prevSearch = curSearchHistory.filter(
+      (item) => !(item.name == search.name && item.country == search.country)
+    );
+
+    const updatedSearchHistory = [...prevSearch, search];
+
+    localStorage.setItem(
+      SEARCH_HISTORY_KEY,
+      JSON.stringify(updatedSearchHistory)
+    );
+    setSearchHistory(updatedSearchHistory);
+    setTimeout(() => {
+      setSearchOpen(false);
+    }, 500);
+  };
+
+  const handleHistorySearch = (location: LocationInfo) => {
+    setCurrentSearch(location);
+  };
+
+  const handleHistoryDelete = (location: LocationInfo) => {
+    const newHistory = searchHistory.filter(
+      (item: LocationInfo) => item.dateSearched !== location.dateSearched
+    );
+    localStorage.setItem(SEARCH_HISTORY_KEY, JSON.stringify(newHistory));
+    setSearchHistory(newHistory);
+  };
+
+  return (
+    <div className="w-full h-dvh flex flex-col items-center justify-start gap-4 pt-5 px-5 md:pt-6 md:px-6 relative overflow-hidden bg-[url(../assets/images/bg-light.png)] dark:bg-[url(../assets/images/bg-dark.png)] bg-image-cover">
+      <div className="absolute bottom-5 right-5 z-90">
+        <ThemeSwitcher />
+      </div>
+      <div className="max-w-[700px] h-full w-full flex flex-col items-center relative gap-[100px]">
+        <SearchInput
+          searchText={searchText}
+          searchOpen={searchOpen}
+          handleKeyDown={handleKeyDown}
+          handleSearchChange={handleSearchChange}
+          handleSearchSelect={handleSearchSelect}
+          handleSearchButton={handleSearchButton}
+        />
+
+        <div className="w-full h-[calc(100%-140px)] relative flex flex-col items-start pt-6 md:pt-10 px-4 md:px-[48px] rounded-t-[24px] bg-white/20 dark:bg-dark-black/20 backdrop-blur-xl gap-5 box-border overflow-y-visible border-white/50 border dark:border-none">
+          {currentSearch && (
+            <SearchResults lat={currentSearch.lat} lon={currentSearch.lon} />
+          )}
+          <SearchHistory
+            searchHistory={searchHistory}
+            handleSearch={handleHistorySearch}
+            handleDelete={handleHistoryDelete}
+          />
         </div>
-      </main>
-      <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
+      </div>
     </div>
   );
 }
