@@ -23,7 +23,7 @@ const locationFetcher = async (
   searchText: string
 ): Promise<LocationResultsData> => {
   const response = await fetch(
-    `http://api.openweathermap.org/geo/1.0/direct?q=${searchText}&limit=5&appid=${process.env.OPENWEATHER_API_KEY}`
+    `https://api.openweathermap.org/geo/1.0/direct?q=${searchText}&limit=5&appid=${process.env.OPENWEATHER_API_KEY}`
   );
   return response.json();
 };
