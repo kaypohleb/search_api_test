@@ -21,6 +21,7 @@ export default function Home() {
   const [searchOpen, setSearchOpen] = useState<boolean>(false);
   const [searchHistory, setSearchHistory] = useState<LocationInfo[]>([]);
 
+  //get current location on mount
   useEffect(() => {
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(success, error);
@@ -45,6 +46,7 @@ export default function Home() {
     console.log("Unable to retrieve your location");
   }
 
+  // Sync to local storage
   useEffect(() => {
     const storedHistory = localStorage.getItem(SEARCH_HISTORY_KEY);
     if (storedHistory && storedHistory !== JSON.stringify(searchHistory)) {
@@ -52,7 +54,7 @@ export default function Home() {
     }
   }, []);
 
-  // Sync from other tabs
+  // Sync from other tabs (for search history)
   useEffect(() => {
     const handleStorageChange = (e: StorageEvent) => {
       if (e.key === SEARCH_HISTORY_KEY && e.newValue) {

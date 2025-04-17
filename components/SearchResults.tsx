@@ -99,7 +99,11 @@ export default function SearchResults({ lat, lon }: SearchResultsProps) {
   }
 
   if (isLoading) {
-    return <div>Loading...</div>;
+    return (
+      <div className="h-[155px] w-full flex justify-center items-center">
+        Loading...
+      </div>
+    );
   }
 
   //only use the first weather since it is considered primary by the API

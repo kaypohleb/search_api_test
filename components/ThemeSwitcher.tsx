@@ -8,6 +8,7 @@ export default function ThemeSwitcher() {
   return (
     <button
       className="cursor-pointer p-2 rounded-full aspect-square bg-white dark:bg-transparent dark:border dark:border-white/40 drop-shadow-2xl"
+      tabIndex={0}
       onClick={() => {
         setDark(!dark);
         document.body.classList.toggle("dark");

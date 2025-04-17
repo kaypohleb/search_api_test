@@ -3,11 +3,17 @@ import { FaSearch } from "react-icons/fa";
 import LocationResults from "./LocationResults";
 
 interface SearchInputProps {
+  /** searchText: text from input */
   searchText: string;
-  searchOpen: boolean
+  /** searchOpen: whether the location results are open */
+  searchOpen: boolean;
+  /** handleKeyDown: handle keyboard input */
   handleKeyDown: (e: React.KeyboardEvent<HTMLInputElement>) => void;
+  /** handleSearchChange: handle input change */
   handleSearchChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  /** handleSearchSelect: handle location selection */
   handleSearchSelect: (location: LocationInfo) => void;
+  /** handleSearchButton: handle search button */
   handleSearchButton: () => void;
 }
 
@@ -26,6 +32,7 @@ export default function SearchInput({
           Country/City
         </label>
         <input
+          autoFocus
           name="country"
           className=" text-[12px] outline-none w-full text-black dark:text-white md:text-[16px]"
           type="text"

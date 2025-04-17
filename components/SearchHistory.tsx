@@ -3,6 +3,7 @@ import { useCallback } from "react";
 import { FaSearch, FaTrash } from "react-icons/fa";
 
 interface SearchHistoryProps {
+  /** searchHistory: array of previous searchs */
   searchHistory: Array<LocationInfo>;
   /** handleSearch - handle Search button */
   handleSearch: (location: LocationInfo) => void;
